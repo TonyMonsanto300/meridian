@@ -1,0 +1,96 @@
+﻿# Ignore Visual Studio temporary files, build results, and
+# build directories.
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+*.rsuser
+*.rsuser.cache
+*.pidb
+*.log
+*.tlog
+*.pdb
+
+# Avoid tracking bin and obj directories.
+bin/
+obj/
+[Bb]uild/
+[Bb]uilds/
+[Bb]uild[Bb]ackups/
+
+# Ignore NuGet packages directory.
+packages/
+*.nupkg
+*.snupkg
+
+# Ignore Yarn and npm package directories.
+node_modules/
+*.yarn/
+
+# Ignore .NET-specific files
+project.lock.json
+project.fragment.lock.json
+project.nuget.cache
+artifacts/
+*.psess
+.vscode/
+
+# Avoid ignoring shared project files
+*.projitems
+
+# Ignore publish output
+publish/
+*.publish.xml
+
+# Ignore Azure Web Apps log files
+azure*.log
+
+# Ignore database files
+*.mdf
+*.ldf
+
+# Avoid committing secrets and user-specific files
+secrets.json
+appsettings*.json
+
+# Ignore Rider/JetBrains IDE files
+.idea/
+*.sln.iml
+.idea/.idea/
+*.DotSettings.user
+
+# Ignore Visual Studio Code specific files
+.vscode/
+.vscode/settings.json
+.vscode/launch.json
+.vscode/tasks.json
+
+# Avoid ignoring system-specific files
+.DS_Store
+Thumbs.db
+*.~*
+*.tmp
+
+# Ignore ReSharper settings
+_ReSharper/
+*.DotSettings.user
+
+# Ignore Visual Studio 2019+ settings
+.vs/
+
+# Ignore coverage and test results
+coverage/
+TestResults/
+*.coverage
+*.coveragexml
+*.sonar
+
+# Ignore temporary files
+*.bak
+*.swp
+*.tmp
+*.log
+
+# Ignore any additional IDE or system-specific configurations
+!ImportantFolder/   # Uncomment and use this if certain subdirectories need tracking
+
