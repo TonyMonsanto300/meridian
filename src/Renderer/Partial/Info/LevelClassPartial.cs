@@ -1,15 +1,18 @@
 ﻿using Microsoft.Xna.Framework;
 using XenWorld.Config;
 using XenWorld.Renderer;
+using XenWorld.src.Loader.Puppet;
 using XenWorld.src.Manager;
 
 namespace XenWorld.src.Renderer.Partial.Info {
     public static class LevelClassPartial {
         public static PrintCursor Render(PrintCursor cursor) {
             int level = PlayerManager.Controller.Puppet.Level;
-            string className = PlayerManager.Controller.Puppet.Class.Name.ToString();
-
-            string levelClassText = $"Lvl. {level} {className}";
+            string levelClassText = $"Lvl. {level}";
+            if(PlayerManager.Controller.Puppet.Class.Name != PuppetClassEnum.None) {
+                string className = PlayerManager.Controller.Puppet.Class.Name.ToString();
+                levelClassText = $"{levelClassText} {className}";
+            }
             Vector2 levelClassSize = RendererManager.DefaultFont.MeasureString(levelClassText);
             cursor.X = InfoRendererConfig.LeftBorder + (RenderConfig.InfoViewPortX * RenderConfig.CellSize - levelClassSize.X) / 2;
             cursor.Y = cursor.Y + RendererManager.DefaultFont.MeasureString(PlayerManager.Controller.Puppet.Name).Y + 5; // Add some vertical spacing

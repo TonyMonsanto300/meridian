@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
 namespace XenWorld.Model.Map {
-    public enum BuildingType {
-        None,
+    public enum BuildingTypeEnum {
+        World,
         House,
         Shop,
         Thrall,
@@ -16,9 +16,9 @@ namespace XenWorld.Model.Map {
         public MapTerrain FloorTerrain { get; set; }
         public Puppet? Owner { get; set; }
         public List<Puppet> Tenants = new List<Puppet>();
-        public BuildingType Type { get; set; } = BuildingType.None;
+        public BuildingTypeEnum Type { get; set; } = BuildingTypeEnum.World;
 
-        public Building(MapCell[] cells, MapCell anchor, MapTerrain floor, BuildingType type, MapCell doorCell = null) {
+        public Building(MapCell[] cells, MapCell anchor, MapTerrain floor, BuildingTypeEnum type, MapCell doorCell = null) {
             Cells = cells;
             AnchorCell = anchor;
             FloorTerrain = floor;

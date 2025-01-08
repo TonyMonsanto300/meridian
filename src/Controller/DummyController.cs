@@ -11,7 +11,7 @@ namespace XenWorld.Controller {
         Enemy
     }
 
-    public class NPCController {
+    public class DummyController {
         private Puppet enemy;
         private Puppet? player = null;
         private ZoneMap mapGrid;
@@ -26,17 +26,19 @@ namespace XenWorld.Controller {
         private int originX, originY;
         private int patrolDirection = -1; // -1 for up, 1 for down
 
+        public string Message => $"{this.Puppet.Name} does not have dialogue yet.";
+
         public NPCType NPCType { get { return type; } set { type = value; } }
 
-        public NPCController(Puppet enemy, PlayerController playerController, ZoneMap mapGrid, NPCType type = NPCType.Idle) {
+        public DummyController(Puppet enemy, ZoneMap mapGrid, NPCType type = NPCType.Idle) {
             this.enemy = enemy;
-            this.player = playerController.Puppet;
+            this.player = PlayerManager.Controller.Puppet;
             this.mapGrid = mapGrid;
             this.type = type;
 
             // Set origin position for patrol
-            originX = enemy.Coordinate.X;
-            originY = enemy.Coordinate.Y;
+            originX = enemy.Location.X;
+            originY = enemy.Location.Y;
         }
 
         public void TakeTurn() {
@@ -73,10 +75,10 @@ namespace XenWorld.Controller {
         private void ScanForPlayer() {
             target = null; // Reset target before scanning.
 
-            int startX = Math.Max(0, enemy.Coordinate.X - scanRange);
-            int endX = Math.Min(mapGrid.Width - 1, enemy.Coordinate.X + scanRange);
-            int startY = Math.Max(0, enemy.Coordinate.Y - scanRange);
-            int endY = Math.Min(mapGrid.Height - 1, enemy.Coordinate.Y + scanRange);
+            int startX = Math.Max(0, enemy.Location.X - scanRange);
+            int endX = Math.Min(mapGrid.Width - 1, enemy.Location.X + scanRange);
+            int startY = Math.Max(0, enemy.Location.Y - scanRange);
+            int endY = Math.Min(mapGrid.Height - 1, enemy.Location.Y + scanRange);
 
             for (int x = startX; x <= endX; x++) {
                 for (int y = startY; y <= endY; y++) {
@@ -93,11 +95,10 @@ namespace XenWorld.Controller {
         private bool CheckAndAttackPlayer() {
             if (player == null) return false; // If no player, can't attack
 
-            int deltaX = Math.Abs(player.Coordinate.X - enemy.Coordinate.X);
-            int deltaY = Math.Abs(player.Coordinate.Y - enemy.Coordinate.Y);
+            int deltaX = Math.Abs(player.Location.X - enemy.Location.X);
+            int deltaY = Math.Abs(player.Location.Y - enemy.Location.Y);
 
-            // Check if the player is in any adjacent cell (including diagonal)
-            if (deltaX <= 1 && deltaY <= 1) {
+            if ((deltaX == 1 && deltaY == 0) || (deltaX == 0 && deltaY == 1)) {
                 Attack(player); // Perform the attack
                 return true; // Attack was successful
             }
@@ -108,8 +109,8 @@ namespace XenWorld.Controller {
         private bool MoveTowardTarget() {
             if (player == null) return false; // If player is null, can't move towards them
 
-            int deltaX = player.Coordinate.X - enemy.Coordinate.X;
-            int deltaY = player.Coordinate.Y - enemy.Coordinate.Y;
+            int deltaX = player.Location.X - enemy.Location.X;
+            int deltaY = player.Location.Y - enemy.Location.Y;
 
             int moveX = 0;
             int moveY = 0;
@@ -123,17 +124,17 @@ namespace XenWorld.Controller {
             }
 
             // Try diagonal movement
-            if (TryMoveEnemyTo(enemy.Coordinate.X + moveX, enemy.Coordinate.Y + moveY)) {
+            if (TryMoveEnemyTo(enemy.Location.X + moveX, enemy.Location.Y + moveY)) {
                 return true; // Successfully moved diagonally
             }
 
             // If diagonal movement isn't possible, try horizontal movement
-            if (moveX != 0 && TryMoveEnemyTo(enemy.Coordinate.X + moveX, enemy.Coordinate.Y)) {
+            if (moveX != 0 && TryMoveEnemyTo(enemy.Location.X + moveX, enemy.Location.Y)) {
                 return true; // Successfully moved horizontally
             }
 
             // If horizontal movement isn't possible, try vertical movement
-            if (moveY != 0 && TryMoveEnemyTo(enemy.Coordinate.X, enemy.Coordinate.Y + moveY)) {
+            if (moveY != 0 && TryMoveEnemyTo(enemy.Location.X, enemy.Location.Y + moveY)) {
                 return true; // Successfully moved vertically
             }
 
@@ -141,17 +142,17 @@ namespace XenWorld.Controller {
         }
 
         private bool Patrol() {
-            int newY = enemy.Coordinate.Y + patrolDirection;
+            int newY = enemy.Location.Y + patrolDirection;
 
             // Ensure NPC stays within patrol distance from origin
             int distanceFromOrigin = Math.Abs(newY - originY);
             if (distanceFromOrigin > patrolDistance) {
                 patrolDirection *= -1; // Reverse patrol direction
-                newY = enemy.Coordinate.Y + patrolDirection; // Recalculate new position
+                newY = enemy.Location.Y + patrolDirection; // Recalculate new position
             }
 
             // Try moving to the new position
-            if (TryMoveEnemyTo(enemy.Coordinate.X, newY)) {
+            if (TryMoveEnemyTo(enemy.Location.X, newY)) {
                 return true; // Successful move
             } else {
                 // Can't move, change direction
@@ -171,9 +172,9 @@ namespace XenWorld.Controller {
             // Check if the target cell is empty and passable
             if (targetCell.Occupant == null && !targetCell.Terrain.Obstacle) {
                 // Move the NPC to the new position
-                mapGrid.Grid[enemy.Coordinate.X, enemy.Coordinate.Y].Occupant = null;
-                enemy.Coordinate.X = newX;
-                enemy.Coordinate.Y = newY;
+                mapGrid.Grid[enemy.Location.X, enemy.Location.Y].Occupant = null;
+                enemy.Location.X = newX;
+                enemy.Location.Y = newY;
                 targetCell.Occupant = enemy;
 
                 return true; // Successful move

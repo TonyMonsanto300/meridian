@@ -3,8 +3,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using XenWorld.Config;
 using XenWorld.Model.Map;
-using XenWorld.Repository.GUI;
-using XenWorld.src.Config;
 using XenWorld.src.Manager;
 using XenWorld.src.Model.Puppet;
 using XenWorld.src.Renderer;
@@ -43,7 +41,7 @@ namespace XenWorld.Renderer {
             DrawCells(startX, startY, highlightColor);
 
             // Handle Ability Class or Ability List rendering based on state
-            HandleAbilityRendering(playerController);
+            DrawAbilityMenu(playerController);
 
             // Draw viewport border
             DrawViewportBorder();
@@ -60,8 +58,8 @@ namespace XenWorld.Renderer {
         private (int startX, int startY) CalculateViewportBounds(PlayerController playerController) {
             int viewportWidth = RenderConfig.MapViewPortX;
             int viewportHeight = RenderConfig.MapViewPortY;
-            int playerX = playerController.Puppet.Coordinate.X;
-            int playerY = playerController.Puppet.Coordinate.Y;
+            int playerX = playerController.Puppet.Location.X;
+            int playerY = playerController.Puppet.Location.Y;
 
             int startX = Math.Clamp(playerX - viewportWidth / 2, 0, map.Width - viewportWidth);
             int startY = Math.Clamp(playerY - viewportHeight / 2, 0, map.Height - viewportHeight);
@@ -130,7 +128,7 @@ namespace XenWorld.Renderer {
             }
         }
 
-        private void HandleAbilityRendering(PlayerController playerController) {
+        private void DrawAbilityMenu(PlayerController playerController) {
             if (playerController.IsChoosingClass) {
                 AbilityWindow.DrawAbilityClassList();
             } else if (playerController.IsCasting) {
@@ -141,11 +139,7 @@ namespace XenWorld.Renderer {
         private void DrawViewportBorder() {
             spriteBatch.Draw(
                 TextureDictionary.Context["blackTexture"],
-                new Rectangle(
-                    0,
-                    RenderConfig.MapViewPortY * RenderConfig.CellSize,
-                    RenderConfig.MapViewPortX * RenderConfig.CellSize,
-                    2),
+                new Rectangle(0, RenderConfig.MapViewPortY * RenderConfig.CellSize, RenderConfig.MapViewPortX * RenderConfig.CellSize, 2),
                 Color.Black);
         }
 

@@ -27,7 +27,9 @@ public class KeyBindDictionary {
 
         // Weapon cycle key binding (W key)
         keyBindings.Add(Keys.W, new KeyBinding(Keys.W, () => {
-            WeaponService.CycleEquippedWeapon(PlayerManager.Controller.Puppet);
+            if(PlayerManager.Controller.CurrentMode != InteractionMode.Attack) {
+                WeaponService.CycleEquippedWeapon(PlayerManager.Controller.Puppet);
+            }
         }));
 
         // Mining key binding (M key)

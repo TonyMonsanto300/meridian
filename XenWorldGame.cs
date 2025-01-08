@@ -27,29 +27,31 @@ namespace XenWorld
 
         protected override void LoadContent() {
 
+            //Game Assets
             TerrainLoader.SeedTerrain(Content);
             SpriteLoader.SeedSprites(Content);
             FontLoader.SeedFonts(Content);
+            TextureLoader.SeedTextures(GraphicsDevice);
+
+            //Pre-Built Objects
             PuppetClassLoader.SeedClasses();
+            ArmorLoader.SeedArmors();
 
-            Texture2D blackTexture = new Texture2D(GraphicsDevice, 1, 1);
-            blackTexture.SetData(new Color[] { Color.Black });
-            TextureDictionary.LoadTexture("blackTexture", blackTexture);
-
-            // Create a 1x1 white texture
-            Texture2D whiteTexture = new Texture2D(GraphicsDevice, 1, 1);
-            whiteTexture.SetData(new Color[] { Color.White });
-            TextureDictionary.LoadTexture("whiteTexture", whiteTexture);
+            //Pre-Built Sets
+            AbilitySetLoader.SeedAbilitySets();
+            WeaponSetLoader.SeedWeaponSets();
+            AccessorySetLoader.SeedAccessorySets();
+            ResourceSetLoader.SeedResourceSets();
 
             MapManager.SetDefaultMap();
 
             PlayerManager.InitializePlayer();
-            PuppetService.InitializeNPCs();
+            PuppetService.InitializePuppets();
             RendererManager.Initialize(GraphicsDevice);
         }
 
         protected override void Update(GameTime gameTime) {
-            PlayerManager.Controller.Update();
+            PlayerManager.Controller.Update(gameTime);
 
             base.Update(gameTime);
         }

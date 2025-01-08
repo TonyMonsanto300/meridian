@@ -1,9 +1,4 @@
-﻿using XenWorld.Controller;
-using XenWorld.Service;
-using XenWorld.src.Model;
-using XenWorld.src.Service;
-
-namespace XenWorld.src.Manager
+﻿namespace XenWorld.src.Manager
 {
     internal class PlayerManager {
         public static bool PartyDead { get; set; } = false;
@@ -13,7 +8,7 @@ namespace XenWorld.src.Manager
             PartyDead = true;
         }
         public static void InitializePlayer() {
-            Controller = PuppetService.PlacePlayerPuppet();
+            new PlayerSpawner().Spawn();
         }
     }
 }

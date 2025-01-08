@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using XenWorld.Controller;
 using XenWorld.src.Manager;
 
 namespace XenWorld.Manager {
@@ -9,14 +7,14 @@ namespace XenWorld.Manager {
 
         public static void PlayerTurn() {
             // Get the player's coordinates (ensure player is not null)
-            var playerX = PlayerManager.Controller.Puppet.Coordinate.X;
-            var playerY = PlayerManager.Controller.Puppet.Coordinate.Y;
+            var playerX = PlayerManager.Controller.Puppet.Location.X;
+            var playerY = PlayerManager.Controller.Puppet.Location.Y;
 
             // Filter NPCs within 500 units using Manhattan distance (sum of the absolute differences of their X and Y coordinates)
-            var nearbyControllers = NPCManager.NPCControllers
+            var nearbyControllers = DummyManager.DummyControllers
                 .Where(controller =>
-                    Math.Abs(controller.Puppet.Coordinate.X - playerX) +
-                    Math.Abs(controller.Puppet.Coordinate.Y - playerY) <= 500)
+                    Math.Abs(controller.Puppet.Location.X - playerX) +
+                    Math.Abs(controller.Puppet.Location.Y - playerY) <= 500)
                 .ToList(); // Convert the filtered results to a list
 
             // Call TakeTurn only for NPCs within the 500 unit range

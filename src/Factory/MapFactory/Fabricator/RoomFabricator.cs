@@ -74,7 +74,7 @@ namespace XenWorld.src.Factory.MapFactory.MapFabricator {
                    BuildFloor(map, center, size, floorName);
         }
 
-        public static void GenerateRooms(ZoneMap map, int roomCount = 1, int size = 3, string floorName = "floor_wood", string borderName = "border", BuildingType type = BuildingType.None) {
+        public static void GenerateRooms(ZoneMap map, int roomCount = 1, int size = 3, string floorName = "floor_wood", string borderName = "border", BuildingTypeEnum type = BuildingTypeEnum.World) {
             int wallSize = size + 1;
             Random random = new Random();
             int roomsAdded = 0;
@@ -94,7 +94,7 @@ namespace XenWorld.src.Factory.MapFactory.MapFabricator {
             Console.WriteLine($"{roomsAdded} room(s) successfully added to the map.");
         }
 
-        private static int ConstructRoom(ZoneMap map, Coordinate center, int size, string floorName, BuildingType type) {
+        private static int ConstructRoom(ZoneMap map, Coordinate center, int size, string floorName, BuildingTypeEnum type) {
             List<MapCell> roomCells = GetRoomCells(map, center.X, center.Y, size);
             MapCell anchorCell = map.Grid[center.X, center.Y];
             MapTerrain floorTerrain = TerrainDictionary.Context[floorName];

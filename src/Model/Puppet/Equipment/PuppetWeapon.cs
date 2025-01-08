@@ -35,12 +35,14 @@ namespace XenWorld.src.Model.Puppet.Equipment {
         public int HitBonus { get; set; } = 0;
         public PuppetWeaponType Type { get; set; }
         public bool TwoHanded { get; set; } = false;
-        public PuppetWeapon(string name, List<Dice> dice, int damageBonus, int hitBonus, PuppetWeaponType type, bool twoHanded = false, StatBlock bonus = null, StatBlock requirement = null) : base(name, bonus, requirement, 0) {
+        public int Range { get; set; } = 1;
+        public PuppetWeapon(string name, List<Dice> dice, int damageBonus, int hitBonus, PuppetWeaponType type, bool twoHanded = false, StatBlock bonus = null, StatBlock requirement = null, int range=1) : base(name, bonus, requirement, 0) {
             DamageDice = dice;
             DamageBonus = damageBonus;
             HitBonus = hitBonus;
             Type = type;
             TwoHanded = twoHanded;
+            Range = range;
         }
 
     }

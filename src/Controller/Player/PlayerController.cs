@@ -1,8 +1,10 @@
 ﻿using System.Linq;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using XenWorld.Manager;
 using XenWorld.Model;
 using XenWorld.src.Controller.Player;
+using XenWorld.src.Manager;
 using XenWorld.src.Model.Puppet;
 using XenWorld.src.Model.Puppet.Ability;
 using XenWorld.src.Service;
@@ -18,7 +20,7 @@ public class PlayerController {
 
     public PlayerController(Puppet puppet) {
         playerPuppet = puppet;
-        InputScanner.LastState = Keyboard.GetState(); // Initialize previous state
+        KeyScanner.LastState = Keyboard.GetState(); // Initialize previous state
     }
 
     // Property to expose the player's Puppet
@@ -32,8 +34,8 @@ public class PlayerController {
         set { currentMode = value; }
     }
 
-    public void Update() {
-        InputScanner.InputScan();
+    public void Update(GameTime gameTime) {
+        KeyScanner.InputScan(gameTime);
     }
 
     public void EnterMode(InteractionMode modeType) {
@@ -47,11 +49,9 @@ public class PlayerController {
             case InteractionMode.Scan:
             case InteractionMode.Mine:
                 MapCursorService.HighlightAdjacentCells(currentMode);
-                MapCursorService.MoveCursor();
                 break;
             case InteractionMode.Attack:
-                MapCursorService.HighlightAdjacentCells(currentMode, 2);
-                MapCursorService.MoveCursor();
+                MapCursorService.HighlightAdjacentCells(currentMode, PlayerManager.Controller.Puppet.EquippedWeapon.Range);
                 break;
             case InteractionMode.Cast:
                 StartCasting(); // Start casting mode with class selection

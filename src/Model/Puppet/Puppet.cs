@@ -61,10 +61,10 @@ namespace XenWorld.Model {
     }
 
     public class Puppet {
-        // Personalization
+        // Identity
         public string Name { get; set; }
         public Texture2D Sprite { get; set; }
-        // Identity
+        // Vitals
         public PuppetClass Class { get; set; }
         public int Level { get; set; } = 1;
         public int Experience { get; set; } = 0;
@@ -74,13 +74,13 @@ namespace XenWorld.Model {
         // Resources
         public Health Health { get; set; }
         public Hunger Hunger { get; set; }
-        public Dictionary<string, PuppetResource> Resources = new Dictionary<string, PuppetResource>();
+        public List<PuppetResource> Resources = new List<PuppetResource>();
         // Abilities
         public List<Ability> Abilities { get; set; }
         // Location
-        public Coordinate Coordinate { get; set; }
-        // Property
-        public Building Home { get; set; }
+        public Coordinate Location { get; set; }
+        // Property -- Nullable
+        public Building? Home { get; set; }
         // Weapons
         public int WeaponSlots { get; set; } = 2;
         public List<PuppetWeapon> Weapons { get; set; } = new List<PuppetWeapon>();
@@ -91,44 +91,22 @@ namespace XenWorld.Model {
         public int AccessorySlots { get; set; } = 3;
         public List<PuppetAccessory> Accessories { get; set; } = new List<PuppetAccessory>();
 
-        public Puppet(string name, Texture2D sprite, PuppetClass puppetClass, int x = -1, int y = -1) {
+        public Puppet(string name, Texture2D sprite, PuppetClass puppetClass, Health health, 
+                List<PuppetResource>? resources, List<Ability> abilities, List<PuppetWeapon> weapons, PuppetArmor armor, List<PuppetAccessory> accessories,
+                Coordinate location) {
             Name = name;
             Sprite = sprite;
             Class = puppetClass;
-            Health = new Health();
+            Health = health;
             Hunger = new Hunger();
-
-            Resources.Add("Mana", new PuppetResource(ResourceType.Mana, 10));
-            Resources.Add("Energy", new PuppetResource(ResourceType.Energy, 10));
-            //Resources.Add("Rune", new PuppetResource(ResourceType.Rune, 10));
-            //Resources.Add("Prayer", new PuppetResource(ResourceType.Prayer, 10));
-
-            Abilities = new List<Ability>() {
-                new Spell("Fireball", "A ball of fire.", ResourceType.Mana, 5, SpellSchool.Common),
-                new Spell("Blood Surge", "A surge of blood magic.", ResourceType.Mana, 7, SpellSchool.Blood),
-                new Skill("Power Strike", "A powerful strike.", ResourceType.Combo, 5, SkillClass.Martial),
-                new Skill("Tracking", "A survival skill for tracking.", ResourceType.Energy, 3, SkillClass.Survival),
-                new Song("Hymn of Valor", "A song of courage.", ResourceType.Prayer, 4, SongKey.Dorian)
-            };
-
-            Coordinate = new Coordinate(x, y);
-            AddWeapon(new PuppetWeapon(
-                "Bronze Dagger",
-                new List<Dice> { Dice.D4 },
-                0,
-                0,
-                PuppetWeaponType.Dagger
-            ));
-            AddWeapon(new PuppetWeapon(
-                "Bronze Sword",
-                new List<Dice> { Dice.D6 },
-                0,
-                0,
-                PuppetWeaponType.LongSword
-            ));
-
-            Armor = new PuppetArmor("Hide Tunic", 1, PuppetArmorClass.Light);
+            Resources = resources;
+            Abilities = abilities;
+            Weapons = weapons;
+            EquippedWeapon = weapons[0];
+            Location = location;
+            Armor = armor;
             AddAccessory(new PuppetAccessory("Bronze Shield", 1, AccessoryType.None));
+            //TODO: Make sure theres logic to set weapon to temporary "Unarmed" if no weapons.
         }
 
         public void AddWeapon(PuppetWeapon weapon) {
@@ -178,9 +156,9 @@ namespace XenWorld.Model {
 
         private void Die() {
             if(this != PlayerManager.Controller.Puppet) {
-                NPCManager.NPCControllers.Remove(NPCManager.NPCControllers.Where(controller => controller.Puppet == this).First());
+                DummyManager.DummyControllers.Remove(DummyManager.DummyControllers.Where(controller => controller.Puppet == this).First());
             }
-            MapManager.ActiveMap.Grid[Coordinate.X, Coordinate.Y].Occupant = null;
+            MapManager.ActiveMap.Grid[Location.X, Location.Y].Occupant = null;
         }
     }
 }

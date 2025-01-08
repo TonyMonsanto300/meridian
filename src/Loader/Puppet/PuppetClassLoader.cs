@@ -4,15 +4,13 @@ using XenWorld.src.Repository.Puppet;
 
 namespace XenWorld.src.Loader.Puppet {
     public enum PuppetClassEnum {
-        Blackguard,
-        Sentinel
+        None
     }
     public class PuppetClassLoader {
         public PuppetClassLoader() { }
 
         private static List<PuppetClass> puppetClasses = new List<PuppetClass>() {
-            new PuppetClass(PuppetClassEnum.Blackguard),
-            new PuppetClass(PuppetClassEnum.Sentinel)
+            new PuppetClass(PuppetClassEnum.None)
         };
 
         public static void SeedClasses() {

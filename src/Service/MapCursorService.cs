@@ -1,5 +1,4 @@
 ﻿using System;
-using XenWorld.Model.Map;
 using XenWorld.src.Manager;
 using XenWorld.src.Model.Puppet;
 
@@ -18,68 +17,143 @@ namespace XenWorld.src.Service {
 
         public static void MoveCursor(PuppetDirection direction = PuppetDirection.None) {
             if (direction == PuppetDirection.None) {
-                direction = MapCursorDirection;
+                Console.WriteLine("No movement direction provided.");
+                return;
             }
 
-            if (DirectionService.directionToCoordinates.TryGetValue(direction, out var coordinates)) {
-                int newX = MapCursor.X + coordinates.x;
-                int newY = MapCursor.Y + coordinates.y;
-
-                if (newX >= 0 && newX < HighlightedCells.GetLength(0) && newY >= 0 && newY < HighlightedCells.GetLength(1) && HighlightedCells[newX, newY] != null) {
-                    // Clear the cursor from the current cell
-                    if (HighlightedCells[MapCursor.X, MapCursor.Y] != null) {
-                        HighlightedCells[MapCursor.X, MapCursor.Y].Cursor = false;
-                    }
-
-                    // Move the cursor to the new cell
-                    MapCursor.X = newX;
-                    MapCursor.Y = newY;
-                    MapCursorDirection = direction;
-                    HighlightedCells[MapCursor.X, MapCursor.Y].Cursor = true;
-
-                    Console.WriteLine($"Cursor moved to {direction} at position ({MapCursor.X}, {MapCursor.Y}).");
-                } else {
-                    Console.WriteLine($"Cannot move cursor to {direction}. Target cell is invalid.");
-                }
+            if (HighlightedCells.GetLength(0) == 3 && HighlightedCells.GetLength(1) == 3) {
+                // Special handling for 3x3 grids, which worked perfectly
+                MoveCursorInSmallGrid(direction);
             } else {
-                Console.WriteLine($"Invalid direction: {direction}. Resetting cursor.");
-                //ResetCursor();
+                // General handling for larger grids, enable center crossing
+                MoveCursorInLargeGrid(direction);
             }
         }
 
-        public static void MoveCursorByDelta(int deltaX, int deltaY) {
-            // Calculate the center of the grid
-            int centerX = HighlightedCells.GetLength(0) / 2;
-            int centerY = HighlightedCells.GetLength(1) / 2;
+        private static void MoveCursorInSmallGrid(PuppetDirection direction) {
+            int center = 1;  // Center index for a 3x3 grid
+            int newX = center, newY = center; // Start from the center
 
-            // Determine the new position
-            int newX = MapCursor.X + deltaX;
-            int newY = MapCursor.Y + deltaY;
-
-            // Detect crossing over the center
-            if ((MapCursor.X != centerX || MapCursor.Y != centerY) &&
-                (newX == centerX && newY == centerY)) {
-                // Adjust newX and newY to skip over the center
-                newX += deltaX;
-                newY += deltaY;
+            switch (direction) {
+                case PuppetDirection.North:
+                    newY--;
+                    break;
+                case PuppetDirection.South:
+                    newY++;
+                    break;
+                case PuppetDirection.East:
+                    newX++;
+                    break;
+                case PuppetDirection.West:
+                    newX--;
+                    break;
+                case PuppetDirection.NorthEast:
+                    newX++;
+                    newY--;
+                    break;
+                case PuppetDirection.NorthWest:
+                    newX--;
+                    newY--;
+                    break;
+                case PuppetDirection.SouthEast:
+                    newX++;
+                    newY++;
+                    break;
+                case PuppetDirection.SouthWest:
+                    newX--;
+                    newY++;
+                    break;
             }
 
-            // Validate the new position
-            if (newX >= 0 && newX < HighlightedCells.GetLength(0) &&
-                newY >= 0 && newY < HighlightedCells.GetLength(1) &&
-                HighlightedCells[newX, newY] != null) {
-                // Clear the cursor from the current cell
-                HighlightedCells[MapCursor.X, MapCursor.Y].Cursor = false;
-
-                // Move the cursor to the new cell
-                MapCursor.X = newX;
-                MapCursor.Y = newY;
-                HighlightedCells[MapCursor.X, MapCursor.Y].Cursor = true;
-
-                Console.WriteLine($"Cursor moved to position ({MapCursor.X}, {MapCursor.Y}).");
+            if (IsWithinBounds(newX, newY) && HighlightedCells[newX, newY] != null) {
+                ClearAndMoveCursor(newX, newY);
             } else {
-                Console.WriteLine($"Cannot move cursor to position ({newX}, {newY}). Target cell is invalid.");
+                Console.WriteLine("Cannot move cursor. Target cell is invalid.");
             }
+        }
+
+        private static void MoveCursorInLargeGrid(PuppetDirection direction) {
+            int center = HighlightedCells.GetLength(0) / 2;
+            int newX = MapCursor.X;
+            int newY = MapCursor.Y;
+
+            // Determine new position based on direction
+            switch (direction) {
+                case PuppetDirection.North:
+                    newY--;
+                    break;
+                case PuppetDirection.South:
+                    newY++;
+                    break;
+                case PuppetDirection.East:
+                    newX++;
+                    break;
+                case PuppetDirection.West:
+                    newX--;
+                    break;
+                case PuppetDirection.NorthEast:
+                    newX++;
+                    newY--;
+                    break;
+                case PuppetDirection.NorthWest:
+                    newX--;
+                    newY--;
+                    break;
+                case PuppetDirection.SouthEast:
+                    newX++;
+                    newY++;
+                    break;
+                case PuppetDirection.SouthWest:
+                    newX--;
+                    newY++;
+                    break;
+            }
+
+            // Check if attempting to move into center and prepare to cross if center is null
+            if (HighlightedCells[center, center] == null && IsMovingIntoCenter(newX, newY, center)) {
+                int skipStep = 1; // Define how much further to move across the center
+                switch (direction) {
+                    case PuppetDirection.North:
+                    case PuppetDirection.South:
+                        newY += (direction == PuppetDirection.North) ? -skipStep : skipStep;
+                        break;
+                    case PuppetDirection.East:
+                    case PuppetDirection.West:
+                        newX += (direction == PuppetDirection.East) ? skipStep : -skipStep;
+                        break;
+                    case PuppetDirection.NorthEast:
+                    case PuppetDirection.SouthWest:
+                    case PuppetDirection.NorthWest:
+                    case PuppetDirection.SouthEast:
+                        newY += (direction == PuppetDirection.NorthEast || direction == PuppetDirection.NorthWest) ? -skipStep : skipStep;
+                        newX += (direction == PuppetDirection.NorthEast || direction == PuppetDirection.SouthEast) ? skipStep : -skipStep;
+                        break;
+                }
+            }
+
+            if (IsWithinBounds(newX, newY) && (HighlightedCells[newX, newY] != null)) {
+                ClearAndMoveCursor(newX, newY);
+            } else {
+                Console.WriteLine("Cannot move cursor. Target cell is invalid, out of bounds, or occupied.");
+            }
+        }
+
+        private static bool IsMovingIntoCenter(int newX, int newY, int center) {
+            // Check if the new coordinates are exactly the center
+            return newX == center && newY == center;
+        }
+
+        private static bool IsWithinBounds(int x, int y) {
+            return x >= 0 && x < HighlightedCells.GetLength(0) && y >= 0 && y < HighlightedCells.GetLength(1);
+        }
+
+        private static void ClearAndMoveCursor(int newX, int newY) {
+            if (HighlightedCells[MapCursor.X, MapCursor.Y] != null) {
+                HighlightedCells[MapCursor.X, MapCursor.Y].Cursor = false;
+            }
+            MapCursor.X = newX;
+            MapCursor.Y = newY;
+            HighlightedCells[MapCursor.X, MapCursor.Y].Cursor = true;
         }
 
         public static void ResetCursor() {
@@ -104,8 +178,8 @@ namespace XenWorld.src.Service {
             int gridSize = range * 2 + 1;
             HighlightedCells = new MapCell[gridSize, gridSize]; // Reset the grid
 
-            int playerX = PlayerManager.Controller.Puppet.Coordinate.X;
-            int playerY = PlayerManager.Controller.Puppet.Coordinate.Y;
+            int playerX = PlayerManager.Controller.Puppet.Location.X;
+            int playerY = PlayerManager.Controller.Puppet.Location.Y;
 
             int maxX = MapManager.ActiveMap.Width - 1; // The maximum X index (world boundary)
             int maxY = MapManager.ActiveMap.Height - 1; // The maximum Y index (world boundary)
@@ -147,6 +221,29 @@ namespace XenWorld.src.Service {
                         // Highlight valid cells
                         cell.Highlighted = true;
                         HighlightedCells[i, j] = cell;
+                    }
+                }
+            }
+
+            // Cull isolated highlighted cells
+            for (int i = 0; i < gridSize; i++) {
+                for (int j = 0; j < gridSize; j++) {
+                    if (HighlightedCells[i, j] != null && HighlightedCells[i, j].Highlighted) {
+                        // Check for neighbors
+                        bool hasNeighbor = false;
+                        foreach (var (dx, dy) in new[] { (0, 1), (1, 0), (0, -1), (-1, 0) }) {
+                            int ni = i + dx;
+                            int nj = j + dy;
+                            if (ni >= 0 && ni < gridSize && nj >= 0 && nj < gridSize && HighlightedCells[ni, nj] != null && HighlightedCells[ni, nj].Highlighted) {
+                                hasNeighbor = true;
+                                break;
+                            }
+                        }
+
+                        // If no neighbors and not directly adjacent to the player (manhattan distance > 1), un-highlight
+                        if (!hasNeighbor && (Math.Abs(i - range) + Math.Abs(j - range) > 1)) {
+                            HighlightedCells[i, j].Highlighted = false;
+                        }
                     }
                 }
             }

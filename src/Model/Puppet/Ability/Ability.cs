@@ -38,7 +38,7 @@
     public class Skill : Ability {
         public SkillClass Class { get; set; }
 
-        public Skill(string name, string description, ResourceType abilityType, int abilityCost, SkillClass skillClass)
+        public Skill(string name, string description, ResourceTypeEnum abilityType, int abilityCost, SkillClass skillClass)
             : base(name, description, AbilityClass.Skill, new AbilityCost(abilityType, abilityCost)) {
             Class = skillClass;
         }
@@ -52,7 +52,7 @@
     public class Spell : Ability {
         public SpellSchool School { get; set; }
 
-        public Spell(string name, string description, ResourceType abilityType, int abilityCost, SpellSchool spellSchool)
+        public Spell(string name, string description, ResourceTypeEnum abilityType, int abilityCost, SpellSchool spellSchool)
             : base(name, description, AbilityClass.Spell, new AbilityCost(abilityType, abilityCost)) {
             School = spellSchool;
         }
@@ -71,17 +71,17 @@
     public class Song : Ability {
         public SongKey Key { get; set; }
 
-        public Song(string name, string description, ResourceType abilityType, int abilityCost, SongKey key)
+        public Song(string name, string description, ResourceTypeEnum abilityType, int abilityCost, SongKey key)
             : base(name, description, AbilityClass.Song, new AbilityCost(abilityType, abilityCost)) {
             Key = key;
         }
     }
 
     public class AbilityCost {
-        public ResourceType Type { get; set; }
+        public ResourceTypeEnum Type { get; set; }
         public int Value { get; set; }
 
-        public AbilityCost(ResourceType type, int value) {
+        public AbilityCost(ResourceTypeEnum type, int value) {
             Type = type;
             Value = value;
         }

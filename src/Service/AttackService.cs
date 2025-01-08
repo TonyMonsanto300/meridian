@@ -8,7 +8,7 @@ namespace XenWorld.src.Service {
     public static class AttackService {
         public static bool AttackCell(Puppet attacker, MapCell target) {
             if (target.Occupant != null) {
-                var targetController = NPCManager.NPCControllers.Where(controller => controller.Puppet == target.Occupant).FirstOrDefault();
+                var targetController = DummyManager.DummyControllers.Where(controller => controller.Puppet == target.Occupant).FirstOrDefault();
                 if (targetController != null) {
                     int damage = DamageService.RollWeaponDamage(attacker.EquippedWeapon);
                     LogRenderer.AddLogMessage($"{attacker.Name} Attacked {targetController.Puppet.Name} for {damage} damage.");
@@ -50,12 +50,9 @@ namespace XenWorld.src.Service {
                     if (isPlayer) {
                         PlayerManager.PartyDead = true;
                         LogRenderer.AddLogMessage("You have been defeated.");
-                        // Implement player defeat logic here (e.g., game over, respawn)
                     } else {
-                        // Attacker gains experience for defeating an NPC
                         attacker.AddExperience(25);
                         LogRenderer.AddLogMessage($"{target.Name} has been defeated.");
-                        // Optionally, remove the NPC from the game or update its state
                     }
                     return true;
                 }

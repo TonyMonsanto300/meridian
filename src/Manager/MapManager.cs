@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using XenWorld.Factory.Map;
+﻿using XenWorld.Factory.Map;
 using XenWorld.Model.Map;
 
 namespace XenWorld.src.Manager {

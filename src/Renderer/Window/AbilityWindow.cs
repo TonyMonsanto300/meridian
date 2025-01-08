@@ -15,8 +15,8 @@ namespace XenWorld.src.Renderer.Window {
             var map = MapManager.ActiveMap;
 
             // Player's position on the map
-            int playerX = playerController.Puppet.Coordinate.X;
-            int playerY = playerController.Puppet.Coordinate.Y;
+            int playerX = playerController.Puppet.Location.X;
+            int playerY = playerController.Puppet.Location.Y;
 
             // Viewport and map properties
             int viewportWidth = RenderConfig.MapViewPortX;
@@ -104,15 +104,15 @@ namespace XenWorld.src.Renderer.Window {
             RendererManager.SpriteBatch.Draw(TextureDictionary.Context["whiteTexture"], new Rectangle((int)position.X + 5, (int)position.Y + 5, width - 10, height - 10), Color.White);
         }
 
-        private static Color GetResourceColor(ResourceType resourceType) {
+        private static Color GetResourceColor(ResourceTypeEnum resourceType) {
             return resourceType switch {
-                ResourceType.Mana => Color.Blue,
-                ResourceType.Miasma => Color.Purple,
-                ResourceType.Fury => Color.Red,
-                ResourceType.Rune => Color.HotPink,
-                ResourceType.Energy => Color.Coral,
-                ResourceType.Combo => Color.Yellow,
-                ResourceType.Prayer => Color.Teal,
+                ResourceTypeEnum.Mana => Color.Blue,
+                ResourceTypeEnum.Miasma => Color.Purple,
+                ResourceTypeEnum.Fury => Color.Red,
+                ResourceTypeEnum.Rune => Color.HotPink,
+                ResourceTypeEnum.Energy => Color.Coral,
+                ResourceTypeEnum.Combo => Color.Yellow,
+                ResourceTypeEnum.Prayer => Color.Teal,
                 _ => Color.White,
             }; ;
         }

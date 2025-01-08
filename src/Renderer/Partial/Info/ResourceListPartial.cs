@@ -10,7 +10,7 @@ using XenWorld.src.Repository.GUI;
 namespace XenWorld.src.Renderer.Partial.Info {
     public static class ResourceListPartial {
         public static PrintCursor Render(PrintCursor position, int labelX, int barX, int barWidth) {
-            foreach (var resource in PlayerManager.Controller.Puppet.Resources.Values) {
+            foreach (var resource in PlayerManager.Controller.Puppet.Resources) {
                 // Draw the label for the resource
                 string resourceLabel = resource.Type.ToString();
                 Vector2 resourceLabelSize = RendererManager.DefaultFont.MeasureString(resourceLabel);
@@ -45,7 +45,7 @@ namespace XenWorld.src.Renderer.Partial.Info {
                 InfoRenderService.DrawRectangleBorder(RendererManager.SpriteBatch, new Rectangle(barX, resourceBarY, barWidth, RenderConfig.CellSize), Color.Black);
 
                 // **Draw notches for Combo resource**
-                if (resource.Type == ResourceType.Combo && resource.Max > 1) {
+                if (resource.Type == ResourceTypeEnum.Combo && resource.Max > 1) {
                     int notchCount = resource.Max - 1;
                     float notchSpacing = (float)barWidth / resource.Max;
                     for (int i = 1; i <= notchCount; i++) {
@@ -59,7 +59,7 @@ namespace XenWorld.src.Renderer.Partial.Info {
                 }
 
                 // **Do not draw numbers inside Combo resource bar**
-                if (resource.Type != ResourceType.Combo) {
+                if (resource.Type != ResourceTypeEnum.Combo) {
                     // Draw resource text inside the bar, centered
                     string resourceText = $"{resource.Current} / {resource.Max}";
                     Vector2 resourceTextSize = RendererManager.DefaultFont.MeasureString(resourceText);
@@ -77,21 +77,21 @@ namespace XenWorld.src.Renderer.Partial.Info {
         }
 
 
-        private static Color GetResourceColor(ResourceType resourceType) {
+        private static Color GetResourceColor(ResourceTypeEnum resourceType) {
             switch (resourceType) {
-                case ResourceType.Mana:
+                case ResourceTypeEnum.Mana:
                     return Color.Blue;
-                case ResourceType.Energy:
+                case ResourceTypeEnum.Energy:
                     return Color.Orange;
-                case ResourceType.Prayer:
+                case ResourceTypeEnum.Prayer:
                     return Color.Cyan;
-                case ResourceType.Miasma:
+                case ResourceTypeEnum.Miasma:
                     return Color.MediumPurple; // Light Purple
-                case ResourceType.Combo:
+                case ResourceTypeEnum.Combo:
                     return Color.Yellow;
-                case ResourceType.Fury:
+                case ResourceTypeEnum.Fury:
                     return Color.Red;
-                case ResourceType.Rune:
+                case ResourceTypeEnum.Rune:
                     return Color.Magenta;
                 default:
                     return Color.White;

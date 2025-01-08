@@ -92,10 +92,10 @@ namespace XenWorld.src.Factory.MapFactory {
             int mediumRoomNumber = _random.Next(1, 4);
             int largeRoomNumber = _random.Next(0, 1);
 
-            RoomFabricator.GenerateRooms(map, largeRoomNumber, 17, _floorTypes[_random.Next(_floorTypes.Count)], type: BuildingType.Temple);
-            RoomFabricator.GenerateRooms(map, largeRoomNumber, 9, _floorTypes[_random.Next(_floorTypes.Count)], type: BuildingType.Thrall);
-            RoomFabricator.GenerateRooms(map, mediumRoomNumber, 5, _floorTypes[_random.Next(_floorTypes.Count)], type: BuildingType.Shop);
-            RoomFabricator.GenerateRooms(map, smallRoomNumber, 3, _floorTypes[_random.Next(_floorTypes.Count)], type: BuildingType.House);
+            RoomFabricator.GenerateRooms(map, largeRoomNumber, 17, _floorTypes[_random.Next(_floorTypes.Count)], type: BuildingTypeEnum.Temple);
+            RoomFabricator.GenerateRooms(map, largeRoomNumber, 9, _floorTypes[_random.Next(_floorTypes.Count)], type: BuildingTypeEnum.Thrall);
+            RoomFabricator.GenerateRooms(map, mediumRoomNumber, 5, _floorTypes[_random.Next(_floorTypes.Count)], type: BuildingTypeEnum.Shop);
+            RoomFabricator.GenerateRooms(map, smallRoomNumber, 3, _floorTypes[_random.Next(_floorTypes.Count)], type: BuildingTypeEnum.House);
 
             CleanupFabricator.CleanUpDebris(map, debriSize);
             return map;
@@ -124,9 +124,9 @@ namespace XenWorld.src.Factory.MapFactory {
         public ZoneMap GeneratePlainsTown(ZoneMap map) {
             FillFabricator.FillZone(map, _groundTerrain);
 
-            RoomFabricator.GenerateRooms(map, 1, 9, _floorTypes[_random.Next(_floorTypes.Count)], _groundTerrain, type: BuildingType.Thrall);
-            RoomFabricator.GenerateRooms(map, 2, 5, _floorTypes[_random.Next(_floorTypes.Count)], _groundTerrain, type: BuildingType.Shop);
-            RoomFabricator.GenerateRooms(map, 8, 3, _floorTypes[_random.Next(_floorTypes.Count)], _groundTerrain, type: BuildingType.House);
+            RoomFabricator.GenerateRooms(map, 1, 9, _floorTypes[_random.Next(_floorTypes.Count)], _groundTerrain, type: BuildingTypeEnum.Thrall);
+            RoomFabricator.GenerateRooms(map, 2, 5, _floorTypes[_random.Next(_floorTypes.Count)], _groundTerrain, type: BuildingTypeEnum.Shop);
+            RoomFabricator.GenerateRooms(map, 8, 3, _floorTypes[_random.Next(_floorTypes.Count)], _groundTerrain, type: BuildingTypeEnum.House);
             return map;
         }
     }

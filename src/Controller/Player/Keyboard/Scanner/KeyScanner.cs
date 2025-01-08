@@ -4,18 +4,20 @@ using XenWorld.src.Model;
 using XenWorld.src.Service;
 using XenWorld.src.Manager;
 using System.Linq;
+using Microsoft.Xna.Framework;
+using System;
 
 namespace XenWorld.src.Controller.Player {
-    public static class InputScanner {
+    public static class KeyScanner {
         public static KeyboardState LastState;
         private static readonly KeyBindDictionary keyBindDictionary;
 
-        static InputScanner() {
+        static KeyScanner() {
             keyBindDictionary = new KeyBindDictionary();
             keyBindDictionary.SeedDefaultBindings();
         }
 
-        public static void InputScan() {
+        public static void InputScan(GameTime gameTime) {
             KeyboardState currentState = Keyboard.GetState();
             bool moved = false;
 
@@ -31,7 +33,7 @@ namespace XenWorld.src.Controller.Player {
                         binding.Execute();
                     } else {
                         // Handle keys not covered by KeyBindings
-                        HandleUnboundKeys(currentState, key, ref moved);
+                        HandleUnboundKeys(currentState, key, gameTime, ref moved);
                     }
                 }
             }
@@ -40,13 +42,13 @@ namespace XenWorld.src.Controller.Player {
             LastState = currentState;
         }
 
-        private static void HandleUnboundKeys(KeyboardState currentState, Keys key, ref bool moved) {
+        private static void HandleUnboundKeys(KeyboardState currentState, Keys key, GameTime gameTime, ref bool moved) {
             // Handle action keys for selecting AbilityClass or casting Ability
             if (PlayerManager.Controller.IsChoosingClass || PlayerManager.Controller.IsCasting) {
                 HandleCastingKeys(key);
             } else if (PlayerManager.Controller.CurrentMode != InteractionMode.None) {
                 // Handle cursor movement within interaction mode
-                HandleCursorMovement(currentState, LastState);
+                HandleCursorMovement(currentState, LastState, gameTime);
             } else {
                 // If we're not in an interaction mode, handle normal movement
                 moved = HandleMovement(key);
@@ -70,33 +72,39 @@ namespace XenWorld.src.Controller.Player {
                 }
             }
         }
-
-        private static void HandleCursorMovement(KeyboardState currentState, KeyboardState lastState) {
-            int deltaX = 0;
-            int deltaY = 0;
-
-            // Movement keys
-            bool leftPressed = currentState.IsKeyDown(Keys.Left);
-            bool rightPressed = currentState.IsKeyDown(Keys.Right);
-            bool upPressed = currentState.IsKeyDown(Keys.Up);
-            bool downPressed = currentState.IsKeyDown(Keys.Down);
-
-            // Check for new key presses to prevent continuous movement
-            bool leftNewPress = IsNewKeyPress(Keys.Left, currentState, lastState);
-            bool rightNewPress = IsNewKeyPress(Keys.Right, currentState, lastState);
-            bool upNewPress = IsNewKeyPress(Keys.Up, currentState, lastState);
-            bool downNewPress = IsNewKeyPress(Keys.Down, currentState, lastState);
-
-            // Determine movement deltas
-            if (leftNewPress) deltaX -= 1;
-            if (rightNewPress) deltaX += 1;
-            if (upNewPress) deltaY -= 1;
-            if (downNewPress) deltaY += 1;
-
-            // Only move if there's a new key press
-            if (deltaX != 0 || deltaY != 0) {
-                MapCursorService.MoveCursorByDelta(deltaX, deltaY);
+        private static TimeSpan lastInputTime = TimeSpan.Zero;
+        private static TimeSpan inputCooldown = TimeSpan.FromMilliseconds(100);  // Cooldown before accepting new input
+        private static void HandleCursorMovement(KeyboardState currentState, KeyboardState lastState, GameTime gameTime) {
+            // Check if the current game time is less than last input time plus cooldown
+            if (gameTime.TotalGameTime < lastInputTime + inputCooldown) {
+                return;  // Do not process input if the cooldown has not elapsed
             }
+
+            bool up = IsNewKeyPress(Keys.Up, currentState, lastState);
+            bool down = IsNewKeyPress(Keys.Down, currentState, lastState);
+            bool left = IsNewKeyPress(Keys.Left, currentState, lastState);
+            bool right = IsNewKeyPress(Keys.Right, currentState, lastState);
+
+            if (up && right) {
+                MapCursorService.MoveCursor(PuppetDirection.NorthEast);
+            } else if (up && left) {
+                MapCursorService.MoveCursor(PuppetDirection.NorthWest);
+            } else if (down && right) {
+                MapCursorService.MoveCursor(PuppetDirection.SouthEast);
+            } else if (down && left) {
+                MapCursorService.MoveCursor(PuppetDirection.SouthWest);
+            } else if (up) {
+                MapCursorService.MoveCursor(PuppetDirection.North);
+            } else if (down) {
+                MapCursorService.MoveCursor(PuppetDirection.South);
+            } else if (left) {
+                MapCursorService.MoveCursor(PuppetDirection.West);
+            } else if (right) {
+                MapCursorService.MoveCursor(PuppetDirection.East);
+            }
+
+            // Update the last input time to the current game time
+            lastInputTime = gameTime.TotalGameTime;
         }
 
         private static bool IsNewKeyPress(Keys key, KeyboardState currentState, KeyboardState lastState) {
@@ -124,8 +132,8 @@ namespace XenWorld.src.Controller.Player {
 
             if (moveX != 0 || moveY != 0) {
                 return MoveService.MovePlayer(new Coordinate(
-                    PlayerManager.Controller.Puppet.Coordinate.X + moveX,
-                    PlayerManager.Controller.Puppet.Coordinate.Y + moveY));
+                    PlayerManager.Controller.Puppet.Location.X + moveX,
+                    PlayerManager.Controller.Puppet.Location.Y + moveY));
             }
 
             return false;

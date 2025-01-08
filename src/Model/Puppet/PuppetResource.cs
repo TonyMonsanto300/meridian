@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace XenWorld.src.Model.Puppet {
-    public enum ResourceType {
+﻿namespace XenWorld.src.Model.Puppet {
+    public enum ResourceTypeEnum {
         Mana,
         Energy,
         Prayer,
@@ -15,11 +9,11 @@ namespace XenWorld.src.Model.Puppet {
         Rune
     }
     public class PuppetResource {
-        public ResourceType Type { get; set; }
+        public ResourceTypeEnum Type { get; set; }
         public int Max { get; set; } = 0;
         public int Current { get; set; } = 0;
 
-        public PuppetResource(ResourceType type, int max, bool fill = true) {
+        public PuppetResource(ResourceTypeEnum type, int max, bool fill = true) {
             Type = type;
             Max = max;
             if (fill) {
